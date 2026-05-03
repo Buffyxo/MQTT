@@ -36,14 +36,15 @@ def insert_co2(payload):
 def insert_weather(payload):
     cursor.execute(
         """
-        INSERT INTO weather_data (timestamp, temperature, humidity, wind_speed)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO weather_data (timestamp, temperature, humidity, wind_speed, solar_radiation)
+        VALUES (%s, %s, %s, %s, %s)
         """,
         (
             payload["timestamp"],
             payload["temperature"],
             payload["humidity"],
-            payload["wind_speed"]
+            payload["wind_speed"],
+            payload["solar_radiation"]
         )
     )
     conn.commit()

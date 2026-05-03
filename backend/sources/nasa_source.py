@@ -8,7 +8,7 @@ def get_data():
 
     params = {
 
-        "parameters": "T2M,RH2M,WS2M",
+        "parameters": "T2M,RH2M,WS2M,ALLSKY_SFC_SW_DWN",
 
         "community": "RE",
 
@@ -36,6 +36,8 @@ def get_data():
 
     ws2m = params_data["WS2M"]
 
+    solar = params_data["ALLSKY_SFC_SW_DWN"]
+
     for timestamp in t2m:
 
         yield {
@@ -46,6 +48,8 @@ def get_data():
 
             "humidity": rh2m[timestamp],
 
-            "wind_speed": ws2m[timestamp]
+            "wind_speed": ws2m[timestamp],
+
+            "solar_radiation": solar[timestamp]
 
         }
