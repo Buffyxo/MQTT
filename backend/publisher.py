@@ -1,26 +1,21 @@
-import pandas as pd
 import json
 import time
 import paho.mqtt.client as mqtt
 
-df = pd.read_csv("./data/cdeii_vic_hourly_2024.csv")
+
+from sources.nasa_source import get_data
+# from sources.csv_source import get_data
 
 client = mqtt.Client()
 client.connect("localhost", 1883, 60)
 
-topic = "co2/data"
 
-for _, row in df.iterrows():
+topic = "weather/data"
+# topic = "co2/data"
 
-    payload = {
-        "timestamp": str(row["Date/Time"]),
-        "co2_g_per_kwh": row["CDEII_gCO2_per_kWh"],
-        "co2_kg_per_kwh": row["CDEII_kgCO2_per_kWh"]
-    }
-
-    client.publish(topic, json.dumps(payload))
-    print("Published:", payload)
-
-    time.sleep(1)  
+for row in get_data():
+    client.publish(topic, json.dumps(row))
+    print("Published:", row)
+    time.sleep(1)
 
 client.disconnect()
