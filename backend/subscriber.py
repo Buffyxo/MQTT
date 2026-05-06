@@ -33,21 +33,62 @@ def insert_co2(payload):
 # Nasa data
 
 
+def parse_timestamp(ts):
+
+    return datetime.strptime(ts, "%Y%m%d%H")
+
+
 def insert_weather(payload):
-    cursor.execute(
-        """
-        INSERT INTO weather_data (timestamp, temperature, humidity, wind_speed, solar_radiation)
-        VALUES (%s, %s, %s, %s, %s)
-        """,
-        (
-            payload["timestamp"],
-            payload["temperature"],
-            payload["humidity"],
-            payload["wind_speed"],
-            payload["solar_radiation"]
+    # conver NASA timestamp to a proper date and time
+    try:
+
+        ts = parse_timestamp(payload["timestamp"])
+
+        cursor.execute(
+
+            """
+
+            INSERT INTO weather_data (
+
+                timestamp,
+
+                temperature,
+
+                humidity,
+
+                wind_speed,
+
+                solar_radiation
+
+            )
+
+            VALUES (%s, %s, %s, %s, %s)
+
+            """,
+
+            (
+
+                ts,
+
+                payload.get("temperature", 0),
+
+                payload.get("humidity", 0),
+
+                payload.get("wind_speed", 0),
+
+                payload.get("solar_radiation", 0)
+
+            )
+
         )
-    )
-    conn.commit()
+
+        conn.commit()
+
+    except Exception as e:
+
+        print("INSERT ERROR:", e)
+
+        print("BAD PAYLOAD:", payload)
 
 # Message routing according to topic
 
