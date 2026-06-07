@@ -1,5 +1,10 @@
 import requests
 import pandas as pd
+from datetime import datetime
+
+
+def clean_timestamp(ts):
+    return datetime.strptime(str(ts), "%Y%m%d%H").isoformat()
 
 
 def get_data():
@@ -42,7 +47,7 @@ def get_data():
 
         yield {
 
-            "timestamp": timestamp,
+            "timestamp": clean_timestamp(timestamp),
 
             "temperature": t2m[timestamp],
 

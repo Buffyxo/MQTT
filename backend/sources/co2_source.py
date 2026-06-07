@@ -1,4 +1,9 @@
 import pandas as pd
+from datetime import datetime
+
+
+def clean_timestamp(ts):
+    return datetime.strptime(ts, "%d/%m/%Y %H:%M").isoformat()
 
 
 def get_data():
@@ -9,7 +14,7 @@ def get_data():
 
         yield {
 
-            "timestamp": str(row["Date/Time"]),
+            "timestamp": clean_timestamp(row["Date/Time"]),
 
             "co2_g_per_kwh": row["CDEII_gCO2_per_kWh"],
 

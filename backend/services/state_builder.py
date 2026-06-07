@@ -1,17 +1,15 @@
-def build_state(latest_weather):
+def build_state(weather, co2, demand, solar):
 
     return {
+        "temperature": weather.get("temperature"),
+        "solar_radiation": weather.get("solar_radiation"),
 
-        "date": latest_weather.get("date", 364),
+        "co2_intensity": co2.get("co2_g_per_kwh"),
 
-        "battery_soc": get_battery_soc(),
+        "demand_forecast": demand.get("total_demand_kwh"),
+        "solar_forecast": solar.get("solar_generation_kw"),
 
-        "solar_kwh": convert(latest_weather["solar_radiation"]),
-
-        "demand_kwh": estimate_demand(latest_weather),
-
-        "grid_import_kwh": 0
-
+        "net_energy": solar.get("solar_generation_kw", 0) - demand.get("total_demand_kwh", 0)
     }
 
 

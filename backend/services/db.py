@@ -15,32 +15,33 @@ def get_latest_weather():
 
     )
 
-    cursor = conn.cursor()
+    try:
+        cursor = conn.cursor()
 
-    cursor.execute("""
+        cursor.execute("""
+            SELECT timestamp, temperature, humidity, wind_speed, solar_radiation
+            FROM weather_data
+            ORDER BY timestamp DESC
+            LIMIT 1
+        """)
 
-        SELECT timestamp, temperature, humidity, wind_speed, solar_radiation
+        row = cursor.fetchone()
 
-        FROM weather_data
+        if not row:
+            return None
 
-        ORDER BY timestamp DESC
+        timestamp = row[0]
 
-        LIMIT 1
+        if hasattr(timestamp, "isoformat"):
+            timestamp = timestamp.isoformat()
 
-    """)
+        return {
+            "timestamp": timestamp,
+            "temperature": row[1],
+            "humidity": row[2],
+            "wind_speed": row[3],
+            "solar_radiation": row[4]
+        }
 
-    row = cursor.fetchone()
-
-    return {
-
-        "timestamp": row[0],
-
-        "temperature": row[1],
-
-        "humidity": row[2],
-
-        "wind_speed": row[3],
-
-        "solar_radiation": row[4]
-
-    }
+    finally:
+        conn.close()
