@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from ..services.state_builder import build_state
 from ..services.dqn_bridge import send_to_dqn
 from backend.api.state_cache import latest_state, latest_output
+from backend.services.redis_client import redis_client
 
 
 # PostgreSQL Connection
@@ -120,11 +121,17 @@ def try_run_ml(client):
 
         # Update FastAPI shared cache
 
-        latest_state.clear()
-        latest_state.update(state)
+        # REDIS
 
-        latest_output.clear()
-        latest_output.update(result)
+        redis_client.set(
+            "state:latest",
+            json.dumps(state)
+        )
+
+        redis_client.set(
+            "output:dqn",
+            json.dumps(result)
+        )
 
         # Publish to MQTT
         client.publish(
@@ -181,3 +188,7 @@ def run_mqtt():
 
     print("MQTT Subscriber Running...")
     client.loop_forever()
+
+
+if __name__ == "__main__":
+    run_mqtt()

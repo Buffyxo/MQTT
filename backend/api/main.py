@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from backend.api.state_cache import latest_state, latest_output, system_config
 from backend.subscriber.subscriber import run_mqtt
+from backend.services.redis_client import redis_client
+
+import json
 
 app = FastAPI(title="Digital Twin API")
 
@@ -12,39 +14,76 @@ def start_mqtt():
     thread.daemon = True
     thread.start()
 
-# ---------------------------
+
 # 1. Live system state (from MQTT pipeline)
-# ---------------------------
 
 
 @app.get("/state/live")
 def get_live_state():
-    return latest_state
+    state = redis_client.get(
+
+        "state:latest"
+
+    )
+
+    if not state:
+
+        return {}
+
+    return json.loads(state)
 
 
-# ---------------------------
 # 2. Live DQN output
-# ---------------------------
+
 @app.get("/output/live")
 def get_live_output():
-    return latest_output
+    output = redis_client.get(
+
+        "output:dqn"
+
+    )
+
+    if not output:
+
+        return {}
+
+    return json.loads(output)
 
 
-# ---------------------------
 # 3. Full system snapshot
-# ---------------------------
+
 @app.get("/system")
 def system_snapshot():
+    state = redis_client.get(
+
+        "state:latest"
+
+    )
+
+    output = redis_client.get(
+
+        "output:dqn"
+
+    )
+
     return {
-        "config": system_config,
-        "state": latest_state,
-        "output": latest_output
+
+        "state":
+
+            json.loads(state)
+
+            if state else {},
+
+        "output":
+
+            json.loads(output)
+
+            if output else {}
+
     }
 
 
-# ---------------------------
-# 4. Optional: trigger run (if you still want manual control)
-# ---------------------------
+# 4. Optional: trigger run
 @app.post("/run")
 def trigger_run():
     return {
